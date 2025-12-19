@@ -15,10 +15,11 @@ import {
     AvatarImage,
 } from '@/components/avatar/avatar';
 import { useTranslation } from 'react-i18next';
-import { Code, FileCode } from 'lucide-react';
+import { Code, FileCode, Link } from 'lucide-react';
 import { SmartQueryInstructions } from './instructions/smart-query-instructions';
 import { DDLInstructions } from './instructions/ddl-instructions';
 import { DBMLInstructions } from './instructions/dbml-instructions';
+import { ConnectionInstructions } from './instructions/connection-instructions';
 import type { ImportMethod } from '@/lib/import-method/import-method';
 
 const DatabasesWithoutDDLInstructions: DatabaseType[] = [
@@ -37,9 +38,12 @@ export interface InstructionsSectionProps {
     showSSMSInfoDialog: boolean;
     setShowSSMSInfoDialog: (show: boolean) => void;
     importMethods?: ImportMethod[];
+    connectionString?: string;
+    onConnectionStringChange?: (connectionString: string) => void;
+    onSchemaExtracted?: (schemaData: string) => void;
 }
 
-const defaultImportMethods: ImportMethod[] = ['query', 'ddl', 'dbml'];
+const defaultImportMethods: ImportMethod[] = ['query', 'ddl', 'dbml', 'connection'];
 
 export const InstructionsSection: React.FC<InstructionsSectionProps> = ({
     databaseType,
@@ -50,6 +54,9 @@ export const InstructionsSection: React.FC<InstructionsSectionProps> = ({
     setShowSSMSInfoDialog,
     showSSMSInfoDialog,
     importMethods = defaultImportMethods,
+    connectionString,
+    onConnectionStringChange,
+    onSchemaExtracted,
 }) => {
     const { t } = useTranslation();
 
@@ -63,6 +70,10 @@ export const InstructionsSection: React.FC<InstructionsSectionProps> = ({
     );
     const showDBML = useMemo(
         () => importMethods.includes('dbml'),
+        [importMethods]
+    );
+    const showConnection = useMemo(
+        () => importMethods.includes('connection'),
         [importMethods]
     );
 
@@ -192,6 +203,18 @@ export const InstructionsSection: React.FC<InstructionsSectionProps> = ({
                             DBML
                         </ToggleGroupItem>
                     )}
+                    {showConnection && (
+                        <ToggleGroupItem
+                            value="connection"
+                            variant="outline"
+                            className="h-6 gap-1 p-0 px-2 shadow-none data-[state=on]:bg-slate-200 dark:data-[state=on]:bg-slate-700"
+                        >
+                            <Avatar className="size-4 rounded-none">
+                                <Link size={16} />
+                            </Avatar>
+                            Connection String
+                        </ToggleGroupItem>
+                    )}
                 </ToggleGroup>
             </div>
 
@@ -208,6 +231,14 @@ export const InstructionsSection: React.FC<InstructionsSectionProps> = ({
                     <DDLInstructions
                         databaseType={databaseType}
                         databaseEdition={databaseEdition}
+                    />
+                ) : importMethod === 'connection' ? (
+                    <ConnectionInstructions
+                        databaseType={databaseType}
+                        databaseEdition={databaseEdition}
+                        connectionString={connectionString}
+                        onConnectionStringChange={onConnectionStringChange}
+                        onSchemaExtracted={onSchemaExtracted}
                     />
                 ) : (
                     <DBMLInstructions

@@ -116,6 +116,7 @@ export const ImportDatabase: React.FC<ImportDatabaseProps> = ({
     );
     const [isAutoFixing, setIsAutoFixing] = useState(false);
     const [showAutoFixButton, setShowAutoFixButton] = useState(false);
+    const [connectionString, setConnectionString] = useState('');
 
     const clearDecorations = useCallback(() => {
         clearErrorHighlight(decorationsCollection.current);
@@ -131,7 +132,7 @@ export const ImportDatabase: React.FC<ImportDatabaseProps> = ({
     // Check if the ddl or dbml is valid
     useEffect(() => {
         clearDecorations();
-        if (importMethod === 'query') {
+        if (importMethod === 'query' || importMethod === 'connection') {
             setSqlValidation(null);
             setShowAutoFixButton(false);
             return;
@@ -470,6 +471,9 @@ export const ImportDatabase: React.FC<ImportDatabaseProps> = ({
                 setShowSSMSInfoDialog={setShowSSMSInfoDialog}
                 showSSMSInfoDialog={showSSMSInfoDialog}
                 importMethods={importMethods}
+                connectionString={connectionString}
+                onConnectionStringChange={setConnectionString}
+                onSchemaExtracted={setScriptResult}
             />
         ),
         [
@@ -481,6 +485,8 @@ export const ImportDatabase: React.FC<ImportDatabaseProps> = ({
             setShowSSMSInfoDialog,
             showSSMSInfoDialog,
             importMethods,
+            connectionString,
+            setScriptResult,
         ]
     );
 
@@ -490,9 +496,11 @@ export const ImportDatabase: React.FC<ImportDatabaseProps> = ({
                 <div className="w-full text-center text-xs text-muted-foreground">
                     {importMethod === 'query'
                         ? 'Smart Query Output'
-                        : importMethod === 'dbml'
-                          ? 'DBML Script'
-                          : 'SQL Script'}
+                        : importMethod === 'connection'
+                          ? 'Paste Query Results Here (JSON format)'
+                          : importMethod === 'dbml'
+                            ? 'DBML Script'
+                            : 'SQL Script'}
                 </div>
                 <div className="flex-1 overflow-hidden">
                     <Suspense fallback={<Spinner />}>
@@ -500,7 +508,7 @@ export const ImportDatabase: React.FC<ImportDatabaseProps> = ({
                             value={scriptResult}
                             onChange={debouncedHandleInputChange}
                             language={
-                                importMethod === 'query'
+                                importMethod === 'query' || importMethod === 'connection'
                                     ? 'json'
                                     : importMethod === 'dbml'
                                       ? 'dbml'

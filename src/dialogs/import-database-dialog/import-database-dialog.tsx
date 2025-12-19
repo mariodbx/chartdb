@@ -22,7 +22,7 @@ export interface ImportDatabaseDialogProps extends BaseDialogProps {
     initialImportMethod?: ImportMethod;
 }
 
-const defaultImportMethods: ImportMethod[] = ['query', 'ddl', 'dbml'];
+const defaultImportMethods: ImportMethod[] = ['query', 'ddl', 'dbml', 'connection'];
 
 export const ImportDatabaseDialog: React.FC<ImportDatabaseDialogProps> = ({
     dialog,

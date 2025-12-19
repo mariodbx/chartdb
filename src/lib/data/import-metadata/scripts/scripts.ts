@@ -29,3 +29,14 @@ export const importMetadataScripts: ImportMetadataScripts = {
     [DatabaseType.COCKROACHDB]: () => cockroachdbQuery,
     [DatabaseType.ORACLE]: () => oracleDBQuery,
 };
+
+export function getImportMetadataScript(
+    databaseType: DatabaseType,
+    options?: {
+        databaseEdition?: DatabaseEdition;
+        databaseClient?: DatabaseClient;
+    }
+): string {
+    const scriptGenerator = importMetadataScripts[databaseType];
+    return scriptGenerator ? scriptGenerator(options) : '';
+}

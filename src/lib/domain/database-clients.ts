@@ -5,6 +5,12 @@ export enum DatabaseClient {
     // PostgreSQL
     POSTGRESQL_PSQL = 'psql',
 
+    // MySQL
+    MYSQL_CLI = 'mysql',
+
+    // SQL Server
+    SQLCMD = 'sqlcmd',
+
     // SQLite
     SQLITE_WRANGLER = 'wrangler',
 }
@@ -12,6 +18,12 @@ export enum DatabaseClient {
 export const databaseClientToLabelMap: Record<DatabaseClient, string> = {
     // PostgreSQL
     [DatabaseClient.POSTGRESQL_PSQL]: 'PSQL',
+
+    // MySQL
+    [DatabaseClient.MYSQL_CLI]: 'MySQL CLI',
+
+    // SQL Server
+    [DatabaseClient.SQLCMD]: 'SQLCMD',
 
     // SQLite
     [DatabaseClient.SQLITE_WRANGLER]: 'Wrangler',

@@ -1,11 +1,30 @@
 import type { ImportMethod } from './import-method';
+import { parseConnectionString } from '../connection-string/connection-string-parser';
 
 export const detectImportMethod = (content: string): ImportMethod | null => {
     if (!content || content.trim().length === 0) return null;
 
     const upperContent = content.toUpperCase();
 
-    // Check for DBML patterns first (case sensitive)
+    // Check for connection string patterns first
+    const connectionStringPatterns = [
+        /^(postgres|postgresql|mysql|mariadb|cockroachdb):\/\//i,
+        /^Server=/i,
+        /^[^/]+\/[^@]+@[^:/]+:\d+\//i, // Oracle format
+        /^clickhouse:\/\//i,
+    ];
+
+    const hasConnectionStringPattern = connectionStringPatterns.some((pattern) =>
+        pattern.test(content.trim())
+    );
+    
+    if (hasConnectionStringPattern) {
+        // Validate it's actually parseable
+        const parsed = parseConnectionString(content.trim());
+        if (parsed) return 'connection';
+    }
+
+    // Check for DBML patterns (case sensitive)
     const dbmlPatterns = [
         /^Table\s+\w+\s*{/m,
         /^Ref:\s*\w+/m,
